@@ -8,8 +8,8 @@ WORKDIR /app
 # (répertoire /app, car il s'agit du WORKDIR)
 COPY requirements.txt requirements.txt
 
-# Installation des dépendances dans le container
-RUN pip3 install -r requirements.txt
+# Installation des dépendances dans le container + outil sqlite 
+RUN pip3 install -r requirements.txt && apk add sqlite
 
 # Creation d'une base vide
 RUN touch quiz.db
