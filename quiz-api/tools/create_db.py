@@ -12,5 +12,5 @@ def log_db(path) :
 def create_question(path = PATH) :
     conn = log_db(path)
     c = conn.cursor()
-    c.execute("create table question(title varchar(255), text varchar(255), image varchar(255), position int primary key, possibleAnswer json);")
+    c.execute("create table question(id int primary key, title varchar(255), text varchar(255), image varchar(255), position int, possibleAnswers json);")
     conn.close()
