@@ -1,5 +1,7 @@
 import sqlite3
 import ast
+import json
+# from .models import Question
 from .models import Question
 
 
@@ -17,6 +19,7 @@ def count_elements(table, path=PATH) :
     result = conn.execute("Select count(*) from {0}".format(table))
     for row in result : 
         return row[0]
+    conn.close()
 
 def insert_question(question,path = PATH) : 
     """Function to insert a new question into the database.
@@ -26,14 +29,14 @@ def insert_question(question,path = PATH) :
     path -- str path to the database file
     """
     conn = log_db(path)
-    conn.execute('INSERT INTO question(id,title, text, image, position, possibleAnswers) VALUES ({},"{}","{}","{}",{},"{}")'.format(
-                                                                                                                                question.id,
-                                                                                                                                question.title, 
-                                                                                                                                question.text,
-                                                                                                                                question.image,
-                                                                                                                                question.position,
-                                                                                                                                question.possibleAnswers
-                                                                                                                            ))
+    conn.execute('INSERT INTO question(id,title, text, image, position, possibleAnswers) VALUES (?,?,?,?,?,?)',(
+                                                                                                                question.id,
+                                                                                                                question.title, 
+                                                                                                                question.text,
+                                                                                                                question.image,
+                                                                                                                question.position,
+                                                                                                                json.dumps(question.possibleAnswers,ensure_ascii=False)
+                                                                                                            ))
     conn.commit()
     conn.close()
     return
@@ -59,8 +62,9 @@ def retrieve_one_question(question_id, path = PATH) :
                             position = row[4],
                             possibleAnswers = row[5]
                         )
-        print(type(question.possibleAnswers))
-        question.possibleAnswers = ast.literal_eval(question.possibleAnswers)
+        print(question.possibleAnswers)
+        # question.possibleAnswers = ast.literal_eval(question.possibleAnswers)
+        question.possibleAnswers = json.loads(question.possibleAnswers)
     conn.close()
     return question
 

@@ -24,7 +24,7 @@ class Question() :
     
     def toJson(self) : 
         """Method to serialize a question."""
-        return json.dumps(self,default= lambda x : x.__dict__)
+        return json.dumps(self,default= lambda x : x.__dict__, ensure_ascii = False)
 
 
 if __name__ == "__main__" : 
@@ -48,7 +48,7 @@ if __name__ == "__main__" :
                 "isCorrect": True
             },
             {
-                "text": "La réponse D",
+                "text": "La rÃ©ponse D",
                 "isCorrect": False
             }
         ]

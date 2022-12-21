@@ -1,8 +1,9 @@
-from flask import Blueprint, request
+from flask import Blueprint, request, jsonify
 from . import models
 from . import database
 from tools import jwt_utils as jwt
 from tools import create_db
+import json
 quiz = Blueprint("quiz", __name__)
 
 @quiz.route('/quiz-info', methods=['GET'])
@@ -37,7 +38,7 @@ def add_questions() :
         jwt.decode_token(token)
         payload = request.get_json()
         count = int(database.count_elements("question"))
-        print(count)
+        # print(payload)
         question = models.Question(
                             id = count,
                             title = payload["title"],
@@ -46,6 +47,11 @@ def add_questions() :
                             position = payload["position"],
                             possibleAnswers = payload["possibleAnswers"]
                         )
+        print(question.toJson())
+        print()
+        print()
+        print(payload)
+        print(payload["possibleAnswers"])
         database.insert_question(question)
         return question.toJson(), 200
     except jwt.JwtError as e:
@@ -81,4 +87,6 @@ def delete_question(which) :
 @quiz.route("/questions/<question_id>", methods=["GET"])
 def get_question(question_id):
     question = database.retrieve_one_question(int(question_id))
+    # question.possibleAnswers = json.loads(question.possibleAnswers)
+    print(question.possibleAnswers)
     return question.toJson(), 200
