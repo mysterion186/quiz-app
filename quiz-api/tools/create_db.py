@@ -14,3 +14,8 @@ def create_question(path = PATH) :
     c = conn.cursor()
     c.execute("create table question(id int primary key, title varchar, text varchar, image varchar, position int, possibleAnswers json);")
     conn.close()
+
+def create_participation(path = PATH) :
+    conn = log_db(path)
+    conn.execute("CREATE TABLE participation (id INTEGER PRIMARY KEY AUTOINCREMENT, player_name TEXT NOT NULL, answers json, score INTEGER NOT NULL)")
+    conn.close()
