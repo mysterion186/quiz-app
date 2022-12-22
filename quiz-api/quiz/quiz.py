@@ -49,14 +49,7 @@ def add_questions() :
                             possibleAnswers = payload["possibleAnswers"]
                         )
         question_number = database.count_elements("question")
-        questions = database.retrieve_all_question(question_number)
-        for elt in questions :
-            if elt.position >= question.position and elt.id != question.id :
-                print(f"La question {elt.text} est de base à la pos {elt.position}, la position de la question problématique est {question.position}")
-                elt.position += 1 
-                database.update_question(elt)
-                print(f"La question {elt.text} est de base à la pos après la maj est {elt.position}")
-        database.insert_question(question)
+        database.update_position(None, question, question_number, "insert")
         return question.toJson(), 200
     except jwt.JwtError as e:
         print(e)
@@ -126,31 +119,24 @@ def update_question(question_id) :
 
     payload = request.get_json()
     question = database.retrieve_one_question(int(question_id))
-    previous_pos = question.position
-    question_number = database.count_elements("question")
     if question == None :
         return "Not Found", 404
+    previous_pos = question.position
+    question_number = database.count_elements("question")
     # Update question, don't take in account the position handling error (position > number of questions)
+    print("Avant update", question.toJson())
     question.title = payload['title']
     question.image = payload["image"]
     question.text = payload["text"]
     question.position = payload["position"]
     question.possibleAnswers = payload["possibleAnswers"]
-    questions = database.retrieve_all_question(question_number)
-    # Update position for the following questions
-    database.update_question(question)
-    for elt in questions :
-        print(previous_pos, question.position)
-        if previous_pos > question.position : 
-            if (elt.position >= question.position and elt.position <= previous_pos) and elt.id != question.id :
-                print(f"UPDATE : La question {elt.text} est de base à la pos {elt.position}, la position de la question problématique est {question.position}")
-                elt.position += 1 
-                database.update_question(elt)
-                print(f"UPDATE : La question {elt.text} est de base à la pos après la maj est {elt.position}")
-        elif question.position > previous_pos :
-            if (elt.position <= question.position and elt.position >= previous_pos) and elt.id != question.id :
-                print(f"UPDATE -: La question {elt.text} est de base à la pos {elt.position}, la position de la question problématique est {question.position}")
-                elt.position -= 1 
-                database.update_question(elt)
-                print(f"UPDATE -: La question {elt.text} est de base à la pos après la maj est {elt.position}")
+    # database.update_question(question)
+    print("Après update", question.toJson())
+    print("Dans le put",previous_pos, question.position)
+    if previous_pos != question.position :
+        print("dans le put cas diff")
+        database.update_position(previous_pos, question, question_number, "update")
+    else : 
+        print("else")
+        database.update_question(question)
     return "No Content", 204
