@@ -48,11 +48,14 @@ def add_questions() :
                             position = payload["position"],
                             possibleAnswers = payload["possibleAnswers"]
                         )
-        print(question.toJson())
-        print()
-        print()
-        print(payload)
-        print(payload["possibleAnswers"])
+        question_number = database.count_elements("question")
+        questions = database.retrieve_all_question(question_number)
+        for elt in questions :
+            if elt.position >= question.position and elt.id != question.id :
+                print(f"La question {elt.text} est de base à la pos {elt.position}, la position de la question problématique est {question.position}")
+                elt.position += 1 
+                database.update_question(elt)
+                print(f"La question {elt.text} est de base à la pos après la maj est {elt.position}")
         database.insert_question(question)
         return question.toJson(), 200
     except jwt.JwtError as e:
@@ -62,7 +65,6 @@ def add_questions() :
 @quiz.route('/questions/<which>', methods=['DELETE'])
 def delete_question(which) : 
     # check if the user wants to delete one question or all questions
-    print(which, type(which))
     if which == "all" :
         question_id = "all"
         code = ("No Content",204)
@@ -87,7 +89,7 @@ def delete_question(which) :
             if question == None : 
                 return "Not found",404
         database.delete_question(question_id)
-        print(code)
+        # print(code)
         return code
     except jwt.JwtError as e:
         print(e)
@@ -124,6 +126,8 @@ def update_question(question_id) :
 
     payload = request.get_json()
     question = database.retrieve_one_question(int(question_id))
+    previous_pos = question.position
+    question_number = database.count_elements("question")
     if question == None :
         return "Not Found", 404
     # Update question, don't take in account the position handling error (position > number of questions)
@@ -132,5 +136,21 @@ def update_question(question_id) :
     question.text = payload["text"]
     question.position = payload["position"]
     question.possibleAnswers = payload["possibleAnswers"]
+    questions = database.retrieve_all_question(question_number)
+    # Update position for the following questions
     database.update_question(question)
+    for elt in questions :
+        print(previous_pos, question.position)
+        if previous_pos > question.position : 
+            if (elt.position >= question.position and elt.position <= previous_pos) and elt.id != question.id :
+                print(f"UPDATE : La question {elt.text} est de base à la pos {elt.position}, la position de la question problématique est {question.position}")
+                elt.position += 1 
+                database.update_question(elt)
+                print(f"UPDATE : La question {elt.text} est de base à la pos après la maj est {elt.position}")
+        elif question.position > previous_pos :
+            if (elt.position <= question.position and elt.position >= previous_pos) and elt.id != question.id :
+                print(f"UPDATE -: La question {elt.text} est de base à la pos {elt.position}, la position de la question problématique est {question.position}")
+                elt.position -= 1 
+                database.update_question(elt)
+                print(f"UPDATE -: La question {elt.text} est de base à la pos après la maj est {elt.position}")
     return "No Content", 204
