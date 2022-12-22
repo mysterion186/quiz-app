@@ -8,7 +8,7 @@ quiz = Blueprint("quiz", __name__)
 
 @quiz.route('/quiz-info', methods=['GET'])
 def GetQuizInfo():
-	return {"size": 0, "scores": []}, 200
+	return {"size": database.count_elements("question") - 1, "scores": []}, 200
 
 @quiz.route('/rebuild-db', methods = ['POST'])
 def init_db():
