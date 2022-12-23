@@ -18,7 +18,7 @@ def count_elements(table, path=PATH) :
     conn = log_db(path)
     result = conn.execute("Select count(*) from {0}".format(table))
     for row in result : 
-        return row[0]
+        return row[0] + 1
     conn.close()
 
 def insert_question(question,path = PATH) : 
@@ -51,7 +51,7 @@ def retrieve_one_question(value,key = "id", path = PATH) :
     path -- str path to the database
     """
     conn = log_db(path)
-    data = conn.execute(f"SELECT * FROM question WHERE {key}='{value}'")
+    data = conn.execute(f"SELECT * FROM question WHERE {key}='{value}' ORDER BY position")
     question = None
     # only 1 loop, because position is an ID
     for row in data : 
@@ -63,17 +63,15 @@ def retrieve_one_question(value,key = "id", path = PATH) :
                             position = row[4],
                             possibleAnswers = row[5]
                         )
-        print(question.possibleAnswers)
         # question.possibleAnswers = ast.literal_eval(question.possibleAnswers)
         question.possibleAnswers = json.loads(question.possibleAnswers)
     conn.close()
     return question
 
-def retrieve_all_question(value, key = 'id', path = PATH):
-    count = count_elements(path)
+def retrieve_all_question(count, key = 'id', path = PATH):
     questions = []
     for k in range(count):
-        temp = retrieve_one_question(value, key, path)
+        temp = retrieve_one_question(k, key, path)
         if temp != None : 
             questions.append(temp)
     return questions
@@ -86,10 +84,13 @@ def delete_question(rule) :
     return
 
 def _delete_id_question(question_id, path = PATH) : 
+    question = retrieve_one_question(question_id)
     conn = log_db(path)
     conn.execute(f"DELETE FROM question WHERE id='{question_id}'")
     conn.commit()
     conn.close()
+    question_number = count_elements("question")
+    update_position(None, question,question_number, "delete")
 
 def _delete_all_questions(path = PATH) : 
     conn = log_db(path)
@@ -117,3 +118,46 @@ def update_question(question, path = PATH) :
     ))
     conn.commit()
     conn.close()
+
+def update_position(previous_pos, question, question_number,action_type) : 
+    questions = retrieve_all_question(question_number)
+    if action_type == "update" : 
+        update_question(question)
+    elif action_type == "insert" :
+        insert_question(question)
+    # elif action_type == "delete" :
+    #     delete_question(question.id)
+    for elt in questions : 
+        if action_type == "delete" :
+            if elt.position >= question.position and elt.id != question.id : 
+                elt.position -= 1
+                update_question(elt)
+
+            continue
+        elif action_type == "insert" :
+            if elt.position >= question.position and elt.id != question.id :
+                elt.position += 1 
+                update_question(elt)
+            continue
+        if previous_pos >= question.position : 
+            if (elt.position >= question.position and elt.position <= previous_pos) and elt.id != question.id :
+                print(f"UPDATE : La question {elt.text} est de base à la pos {elt.position}, la position de la question problématique est {question.position}")
+                elt.position += 1 
+                print(f"UPDATE : La question {elt.text} est de base à la pos après la maj est {elt.position}")
+                update_question(elt)
+        elif question.position > previous_pos :
+            if (elt.position <= question.position and elt.position >= previous_pos) and elt.id != question.id :
+                print(f"UPDATE -: La question {elt.text} est de base à la pos {elt.position}, la position de la question problématique est {question.position}")
+                elt.position -= 1 
+                print(f"UPDATE -: La question {elt.text} est de base à la pos après la maj est {elt.position}")
+                update_question(elt)
+
+def get_correct_answer_pos(question) : 
+    answers = question.possibleAnswers
+    count = 1
+    for elt in answers :
+        if not elt["isCorrect"] :
+            count += 1 
+        else : 
+            break
+    return count

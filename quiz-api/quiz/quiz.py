@@ -4,11 +4,12 @@ from . import database
 from tools import jwt_utils as jwt
 from tools import create_db
 import json
+from participations import database as p_database
 quiz = Blueprint("quiz", __name__)
 
 @quiz.route('/quiz-info', methods=['GET'])
 def GetQuizInfo():
-	return {"size": 0, "scores": []}, 200
+	return {"size": database.count_elements("question") - 1, "scores": p_database.retrieve_all_participations()}, 200
 
 @quiz.route('/rebuild-db', methods = ['POST'])
 def init_db():
@@ -48,12 +49,8 @@ def add_questions() :
                             position = payload["position"],
                             possibleAnswers = payload["possibleAnswers"]
                         )
-        print(question.toJson())
-        print()
-        print()
-        print(payload)
-        print(payload["possibleAnswers"])
-        database.insert_question(question)
+        question_number = database.count_elements("question")
+        database.update_position(None, question, question_number, "insert")
         return question.toJson(), 200
     except jwt.JwtError as e:
         print(e)
@@ -62,7 +59,6 @@ def add_questions() :
 @quiz.route('/questions/<which>', methods=['DELETE'])
 def delete_question(which) : 
     # check if the user wants to delete one question or all questions
-    print(which, type(which))
     if which == "all" :
         question_id = "all"
         code = ("No Content",204)
@@ -87,7 +83,7 @@ def delete_question(which) :
             if question == None : 
                 return "Not found",404
         database.delete_question(question_id)
-        print(code)
+        # print(code)
         return code
     except jwt.JwtError as e:
         print(e)
@@ -126,11 +122,22 @@ def update_question(question_id) :
     question = database.retrieve_one_question(int(question_id))
     if question == None :
         return "Not Found", 404
+    previous_pos = question.position
+    question_number = database.count_elements("question")
     # Update question, don't take in account the position handling error (position > number of questions)
+    print("Avant update", question.toJson())
     question.title = payload['title']
     question.image = payload["image"]
     question.text = payload["text"]
     question.position = payload["position"]
     question.possibleAnswers = payload["possibleAnswers"]
-    database.update_question(question)
+    # database.update_question(question)
+    print("Après update", question.toJson())
+    print("Dans le put",previous_pos, question.position)
+    if previous_pos != question.position :
+        print("dans le put cas diff")
+        database.update_position(previous_pos, question, question_number, "update")
+    else : 
+        print("else")
+        database.update_question(question)
     return "No Content", 204
