@@ -5,11 +5,10 @@ class Participation():
     """
     Class that represents a participation
     """
-    def __init__(self,player_name,answers,date):
-        self.player_name = player_name
-        self.answers = answers
+    def __init__(self,playerName,score,date):
+        self.playerName = playerName
         self.date = date
-        self.score = None
+        self.score = score
 
     def toJson(self) :
         """Method to serialize a participation."""

@@ -4,11 +4,12 @@ from . import database
 from tools import jwt_utils as jwt
 from tools import create_db
 import json
+from participations import database as p_database
 quiz = Blueprint("quiz", __name__)
 
 @quiz.route('/quiz-info', methods=['GET'])
 def GetQuizInfo():
-	return {"size": database.count_elements("question") - 1, "scores": []}, 200
+	return {"size": database.count_elements("question") - 1, "scores": p_database.retrieve_all_participations()}, 200
 
 @quiz.route('/rebuild-db', methods = ['POST'])
 def init_db():

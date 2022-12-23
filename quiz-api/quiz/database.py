@@ -51,7 +51,7 @@ def retrieve_one_question(value,key = "id", path = PATH) :
     path -- str path to the database
     """
     conn = log_db(path)
-    data = conn.execute(f"SELECT * FROM question WHERE {key}='{value}'")
+    data = conn.execute(f"SELECT * FROM question WHERE {key}='{value}' ORDER BY position")
     question = None
     # only 1 loop, because position is an ID
     for row in data : 
@@ -151,3 +151,13 @@ def update_position(previous_pos, question, question_number,action_type) :
                 elt.position -= 1 
                 print(f"UPDATE -: La question {elt.text} est de base à la pos après la maj est {elt.position}")
                 update_question(elt)
+
+def get_correct_answer_pos(question) : 
+    answers = question.possibleAnswers
+    count = 1
+    for elt in answers :
+        if not elt["isCorrect"] :
+            count += 1 
+        else : 
+            break
+    return count

@@ -17,5 +17,5 @@ def create_question(path = PATH) :
 
 def create_participation(path = PATH) :
     conn = log_db(path)
-    conn.execute("CREATE TABLE participation (id INTEGER PRIMARY KEY AUTOINCREMENT, player_name TEXT NOT NULL, answers json, score INTEGER NOT NULL)")
+    conn.execute("CREATE TABLE participation (id INTEGER PRIMARY KEY AUTOINCREMENT, player_name TEXT NOT NULL, score INTEGER NOT NULL, date TEXT NOT NULL)")
     conn.close()
