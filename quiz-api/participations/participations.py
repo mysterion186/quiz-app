@@ -9,6 +9,12 @@ participation = Blueprint('participation',__name__)
 
 @participation.route("/participations/all", methods=["DELETE"])
 def delete_all() : 
+    """
+    Route to delete the participation table.
+
+    Returns : 
+    tuple(str, int) : a tuple containing a status message and a code.
+    """
     #Check if user is logged in
     raw_token = request.headers.get('Authorization')
     if raw_token == None : 
@@ -24,21 +30,29 @@ def delete_all() :
 
 @participation.route("/participations", methods=["POST"])
 def participate():
+    """
+    Route to accept user's answers for the quiz.
+
+    Returns : 
+    tuple(Union[dict, str], int) : the dict is a review of his game (name, score, date, lists of his answers and the actual answers).
+    """
     payload = request.get_json()
     number_question = q_database.count_elements("question") - 1
     player_name = payload["playerName"]
     answers = payload["answers"]
+    
+    # if the users didn't anwered to all the questions or to too many questions.
     if len(answers) != number_question : 
         return "Not same lenght", 400
+    
+    # list all questions, to calculate user's score.
     questions = q_database.retrieve_all_question(number_question + 1)
     score = 0
     for k in range(len(questions)):
-        print(questions[k].possibleAnswers)
-        print(answers[k])
-        print(q_database.get_correct_answer_pos(questions[k]) == answers[k])
-        print()
         if q_database.get_correct_answer_pos(questions[k]) == answers[k]:
             score += 1
+    
+    # create the users Participation object to store it.
     now = datetime.now()
     formatted_date_time = now.strftime("%d/%m/%Y %H:%M:%S")
     participation = models.Participation(
