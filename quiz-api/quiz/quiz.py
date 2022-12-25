@@ -9,15 +9,28 @@ quiz = Blueprint("quiz", __name__)
 
 @quiz.route('/quiz-info', methods=['GET'])
 def GetQuizInfo():
-	return {"size": database.count_elements("question") - 1, "scores": p_database.retrieve_all_participations()}, 200
+    """
+    Route to get quiz info
+
+    Returns : 
+    tuple(dict, int) : the dictionary contains intel such as the number of questions + the ordered scores of players
+    """
+    return {"size": database.count_elements("question") - 1, "scores": p_database.retrieve_all_participations()}, 200
 
 @quiz.route('/rebuild-db', methods = ['POST'])
 def init_db():
+    """
+    create the participation and question table in sqlite
+
+    Returns : 
+    tuple(str, int) : (status, code)
+    """
     raw_token = request.headers.get('Authorization')
     if raw_token == None : 
         return 'Missing authorization headers', 401
     token = raw_token.replace("Bearer ","")
     try : 
+        jwt.decode_token(token)
         try : 
             create_db.create_question(path = create_db.PATH)
             create_db.create_participation(path = create_db.PATH)
@@ -31,6 +44,14 @@ def init_db():
 
 @quiz.route('/questions',methods=['POST'])
 def add_questions() : 
+    """
+    add a question to the game.
+
+    This function also updates the position of other questions if it is necessary.
+
+    Returns : 
+    tuple(str, int) : (status, code)
+    """
     # headers = request.headers
     raw_token = request.headers.get('Authorization')
     if raw_token == None : 
@@ -40,7 +61,6 @@ def add_questions() :
         jwt.decode_token(token)
         payload = request.get_json()
         count = int(database.count_elements("question"))
-        # print(payload)
         question = models.Question(
                             id = count,
                             title = payload["title"],
@@ -50,6 +70,7 @@ def add_questions() :
                             possibleAnswers = payload["possibleAnswers"]
                         )
         question_number = database.count_elements("question")
+        question.possibleAnswers = database.add_id_to_answer(question.possibleAnswers)
         database.update_position(None, question, question_number, "insert")
         return question.toJson(), 200
     except jwt.JwtError as e:
@@ -58,6 +79,17 @@ def add_questions() :
 
 @quiz.route('/questions/<which>', methods=['DELETE'])
 def delete_question(which) : 
+    """
+    delete either all the question or one question from the question table.
+
+    This function also updates the position of other questions if it is necessary.
+    
+    Args :
+    which (str) : indicate if we have to delete "all" the question or "X" where X is the question's id.
+
+    Returns : 
+    tuple(str, int) : (status, code)
+    """
     # check if the user wants to delete one question or all questions
     if which == "all" :
         question_id = "all"
@@ -83,7 +115,6 @@ def delete_question(which) :
             if question == None : 
                 return "Not found",404
         database.delete_question(question_id)
-        # print(code)
         return code
     except jwt.JwtError as e:
         print(e)
@@ -91,14 +122,28 @@ def delete_question(which) :
 
 @quiz.route("/questions/<question_id>", methods=["GET"])
 def get_question(question_id):
+    """
+    get the question that matches the id.
+
+    Args : 
+    question_id (int) : question's id.
+
+    Returns : 
+    tuple(Union[dict, str], int) : the dictionnay is the serialized question, str is error message.
+    """
     question = database.retrieve_one_question(int(question_id))
-    # question.possibleAnswers = json.loads(question.possibleAnswers)
     if question == None : 
         return "Not Found",404
     return question.toJson(), 200
 
 @quiz.route("/questions", methods=["GET"])
 def get_questions_by_position():
+    """
+    get the question by it's position in the game.
+
+    Returns :
+    tuple(Union[dict, str], int) : the dictionnay is the serialized quesiton, str is error message
+    """
     pos_id = int(request.args.get("position"))
     question = database.retrieve_one_question(pos_id, key="position")
     if question == None : 
@@ -107,6 +152,17 @@ def get_questions_by_position():
 
 @quiz.route("/questions/<question_id>", methods=["PUT"])
 def update_question(question_id) : 
+    """
+    update a specific question
+
+    This function also updates the position of other questions if it is necessary.
+
+    Args : 
+    questino_id (int) : id of the question that we want to modify. 
+
+    Returns : 
+    tuple(str, int) : (status, code)
+    """
     #Check if user is logged in
     raw_token = request.headers.get('Authorization')
     if raw_token == None : 
@@ -125,19 +181,15 @@ def update_question(question_id) :
     previous_pos = question.position
     question_number = database.count_elements("question")
     # Update question, don't take in account the position handling error (position > number of questions)
-    print("Avant update", question.toJson())
     question.title = payload['title']
     question.image = payload["image"]
     question.text = payload["text"]
     question.position = payload["position"]
     question.possibleAnswers = payload["possibleAnswers"]
+    question.possibleAnswers = database.add_id_to_answer(question.possibleAnswers)
     # database.update_question(question)
-    print("Après update", question.toJson())
-    print("Dans le put",previous_pos, question.position)
     if previous_pos != question.position :
-        print("dans le put cas diff")
         database.update_position(previous_pos, question, question_number, "update")
     else : 
-        print("else")
         database.update_question(question)
     return "No Content", 204
