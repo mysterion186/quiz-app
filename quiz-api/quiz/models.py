@@ -8,12 +8,16 @@ class Question() :
     def __init__(self,id,title,text,image,position,possibleAnswers) : 
         """Constructor to create a question object.
         
-        Keyword Arguments : 
-        title -- str question theme
-        text -- str actual question
-        image -- basecode 64 image that represents the question
-        position -- int equivalent of the question id
-        possibleAnswers -- list of dictionaries that contains possible answers
+        Args : 
+        id (int) : The id of the question.
+        title (str) : quesion's theme.
+        text (str) : actual question.
+        image (str) : basecode64 encoded image.
+        position (int) : question's position in the game.
+        possibleAnswers (list(dict)) : question's answers with the good answer.
+
+        Returns : 
+        None
         """
         self.id = id
         self.title = title 
@@ -23,7 +27,12 @@ class Question() :
         self.possibleAnswers = possibleAnswers
     
     def toJson(self) : 
-        """Method to serialize a question."""
+        """
+        Method to serialize a participation.
+
+        Returns : 
+        dict 
+        """
         return json.dumps(self,default= lambda x : x.__dict__, ensure_ascii = False)
 
 
