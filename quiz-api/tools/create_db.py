@@ -24,7 +24,7 @@ def create_question(path = PATH) :
     """
     conn = log_db(path)
     c = conn.cursor()
-    c.execute("DROP table question")
+    c.execute("DROP TABLE IF EXISTS question")
     c.execute("create table question(id int primary key, title varchar, text varchar, image varchar, position int, possibleAnswers json);")
     conn.close()
     return
@@ -41,7 +41,7 @@ def create_participation(path = PATH) :
     """
     conn = log_db(path)
     c = conn.cursor()
-    c.execute("DROP table participation")
+    c.execute("DROP TABLE IF EXISTS participation")
     c.execute("CREATE TABLE participation (id INTEGER PRIMARY KEY AUTOINCREMENT, player_name TEXT NOT NULL, score INTEGER NOT NULL, date TEXT NOT NULL)")
     conn.close()
     return
