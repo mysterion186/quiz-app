@@ -6,6 +6,8 @@
     </div>
   </ul>
   <router-link to="/NewQuiz">Démarrer le quiz !</router-link>
+  <br />
+  
 </template>
 
 <script>
@@ -22,7 +24,7 @@ export default {
     console.log("Composant Home page 'created'");
     try {
       const scores = await quizApiService.getScores();
-      this.registeredScores = scores;
+      this.registeredScores = scores.data['scores'];
     } catch (error) {
       console.error(error);
     }
