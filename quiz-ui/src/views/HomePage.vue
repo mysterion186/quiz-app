@@ -23,7 +23,7 @@ export default {
   async created() {
     console.log("Composant Home page 'created'");
     try {
-      const scores = await quizApiService.getScores();
+      const scores = await quizApiService.getQuizInfo();
       this.registeredScores = scores.data['scores'];
     } catch (error) {
       console.error(error);
