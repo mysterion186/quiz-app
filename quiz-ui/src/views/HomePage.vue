@@ -12,6 +12,7 @@
 
 <script>
 import quizApiService from "@/services/QuizApiService";
+import ParticipationStorageService from "../services/ParticipationStorageService";
 
 export default {
   name: "HomePage",
@@ -25,6 +26,7 @@ export default {
     try {
       const scores = await quizApiService.getQuizInfo();
       this.registeredScores = scores.data['scores'];
+      ParticipationStorageService.saveSize(scores.data["size"]);
     } catch (error) {
       console.error(error);
     }
