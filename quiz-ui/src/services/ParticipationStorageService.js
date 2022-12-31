@@ -19,5 +19,11 @@ export default {
       },
       getSize() {
             return window.localStorage.getItem("size");
+      },
+      saveToken(token) {
+            window.localStorage.setItem("token", token);
+      },
+      getToken() {
+            return window.localStorage.getItem("token");
       }
     };

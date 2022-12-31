@@ -54,7 +54,7 @@ def participate():
         correct_position = q_database.get_correct_answer_pos(questions[k])
         if  correct_position == answers[k]:
             score += 1
-        answersSummaries.append([correct_position, answers[k]])
+        answersSummaries.append([correct_position, correct_position == answers[k]])
     # create the users Participation object to store it.
     now = datetime.now()
     formatted_date_time = now.strftime("%d/%m/%Y %H:%M:%S")

@@ -1,6 +1,6 @@
 <template>
   <h1>
-    {{ this.username }} your score for the game is {{ this.score }} !
+    {{ this.username }} ton score pour le jeu est de : {{ this.score }} !
   </h1>
   <button type="button" @click="goBack" class="btn btn-success">Retour page d'accueil</button>
 </template>

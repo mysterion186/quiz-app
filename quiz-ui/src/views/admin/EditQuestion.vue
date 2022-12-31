@@ -1,0 +1,166 @@
+<template>
+    <h1>Page édition question</h1>
+    <form>
+        <p>
+            <label class="form-label" >Thème de la question </label>
+            <input v-model="title" type="text" id="title" placeholder="Thème" class='form-control'>
+            
+            <label class="form-label" >Intitulé de la question : </label>
+            <input v-model="text" type="text" id="text" placeholder="intitulé" class='form-control'>
+            
+            <label class="form-label" >Position dans le quiz : </label>
+            <input v-model.number="position" type="number" id="text" placeholder="Position" class='form-control'>
+            
+            <label class="form-label" >Réponse 1 :
+                <input v-model="possibleAnswers1Text" type="text" id="text" placeholder="Réponse 1" class='form-control'>
+                <label for="checkbox">Bonne réponse : </label>
+                <input 
+                    type="checkbox" 
+                    id="checkbox1" 
+                    :value="1" 
+                    v-model="possibleAnswers1Bool" 
+                    :disabled="possibleAnswers2Bool || possibleAnswers3Bool || possibleAnswers4Bool"
+                >
+            </label>
+            <br />
+            
+            <label class="form-label" >Réponse 2 :
+                <input v-model="possibleAnswers2Text" type="text" id="text" placeholder="Réponse 2" class='form-control'>
+                <label for="checkbox">Bonne réponse : </label>
+                <input 
+                    type="checkbox" 
+                    id="checkbox2" 
+                    :value="2" 
+                    v-model="possibleAnswers2Bool"
+                    :disabled="possibleAnswers1Bool || possibleAnswers3Bool || possibleAnswers4Bool"
+                >
+            </label>
+            <br />
+            
+            <label class="form-label" >Réponse 3 :
+                <input v-model="possibleAnswers3Text" type="text" id="text" placeholder="Réponse 3" class='form-control'>
+                <label for="checkbox">Bonne réponse : </label>
+                <input 
+                    type="checkbox" 
+                    id="checkbox3" 
+                    :value="3" 
+                    v-model="possibleAnswers3Bool"
+                    :disabled="possibleAnswers1Bool || possibleAnswers2Bool || possibleAnswers4Bool"
+                >
+            </label>
+            <br />
+            
+            <label class="form-label" >Réponse 4 :
+                <input v-model="possibleAnswers4Text" type="text" id="text" placeholder="Réponse 4" class='form-control'>
+                <label for="checkbox">Bonne réponse : </label>
+                <input 
+                    type="checkbox" 
+                    id="checkbox4" 
+                    :value="4" 
+                    v-model="possibleAnswers4Bool"
+                    :disabled="possibleAnswers1Bool || possibleAnswers2Bool || possibleAnswers3Bool"
+                >
+            </label>
+            <br />
+            
+            <label class="form-label" >Image pour la question : </label>
+            <br />
+            <input
+                type="file"
+                accept="image/jpeg/*"
+                
+            />
+        </p> 
+        <p>
+            <button type="button" @click="Update" class="btn btn-success">Ajouter la question</button>
+        </p>
+    </form>
+</template>
+
+<script>
+import QuizApiService from '../../services/QuizApiService'; 
+import ParticipationStorageService from '../../services/ParticipationStorageService';
+export default {   
+  data(){
+      return {
+        question_id: "",
+        title: "",
+        text: "",
+        image: "",
+        position : "",
+        selected : [],
+        possibleAnswers1Text : "",
+        possibleAnswers2Text : "",
+        possibleAnswers3Text : "",
+        possibleAnswers4Text : "",
+        possibleAnswers1Bool : false,
+        possibleAnswers2Bool : false,
+        possibleAnswers3Bool : false,
+        possibleAnswers4Bool : false,
+      }
+  },
+  async created() {
+    this.question_id = this.$route.params.id;
+    const response = await QuizApiService.getQuestionById(this.question_id);
+    const question = response.data;
+    this.title = question.title;
+    this.text = question.text;
+    this.image = question.image;
+    this.position = question.position;
+    this.possibleAnswers1Text = question.possibleAnswers[0]["text"];
+    this.possibleAnswers1Bool = question.possibleAnswers[0].isCorrect;
+    
+    this.possibleAnswers2Text = question.possibleAnswers[1]["text"];
+    this.possibleAnswers2Bool = question.possibleAnswers[1].isCorrect;
+    
+    this.possibleAnswers3Text = question.possibleAnswers[2]["text"];
+    this.possibleAnswers3Bool = question.possibleAnswers[2].isCorrect;
+    
+    this.possibleAnswers4Text = question.possibleAnswers[3]["text"];
+    this.possibleAnswers4Bool = question.possibleAnswers[3].isCorrect;
+  },
+  methods : {
+    async Update(){
+        const data = this.CreateData();
+        console.log(data);
+        const token = ParticipationStorageService.getToken();
+        var response = await QuizApiService.updateQuestion(this.question_id,data,token);
+        if (response == undefined) {
+            this.$router.push("/admin");
+        }
+        console.log(response);
+    },
+    CreateData() {
+        var response = {
+            "title" : this.title,
+            "text" : this.text,
+            "position":this.position,
+            "image" : this.image,
+            "possibleAnswers" : [
+                {
+                    "text" : this.possibleAnswers1Text,
+                    "isCorrect" : this.possibleAnswers1Bool
+                },
+                {
+                    "text" : this.possibleAnswers2Text,
+                    "isCorrect" : this.possibleAnswers2Bool
+                },
+                {
+                    "text" : this.possibleAnswers3Text,
+                    "isCorrect" : this.possibleAnswers3Bool
+                },
+                {
+                    "text" : this.possibleAnswers4Text,
+                    "isCorrect" : this.possibleAnswers4Bool
+                }
+            ]
+        };
+        return response;
+    },
+  }   
+};
+</script>
+
+<style>
+
+</style>

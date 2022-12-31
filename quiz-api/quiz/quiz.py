@@ -144,11 +144,16 @@ def get_questions_by_position():
     Returns :
     tuple(Union[dict, str], int) : the dictionnay is the serialized quesiton, str is error message
     """
-    pos_id = int(request.args.get("position"))
-    question = database.retrieve_one_question(pos_id, key="position")
-    if question == None : 
-        return "Not Found",404
-    return question.toJson(), 200
+    try : 
+        pos_id = int(request.args.get("position"))
+        question = database.retrieve_one_question(pos_id, key="position")
+        if question == None : 
+            return "Not Found",404
+        return question.toJson(), 200
+    except : 
+        count = database.count_elements("question")
+        questions = database.retrieve_all_question(count)
+        return [json.loads(elt.toJson()) for elt in questions], 200
 
 @quiz.route("/questions/<question_id>", methods=["PUT"])
 def update_question(question_id) : 
