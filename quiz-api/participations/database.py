@@ -73,4 +73,5 @@ def retrieve_all_participations(path = PATH):
             date = row[3]
         )
         participations.append(json.loads(participation.toJson()))
+    conn.close()
     return participations

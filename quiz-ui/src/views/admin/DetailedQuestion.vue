@@ -22,6 +22,12 @@ export default {
       }
   },
   async created() {
+    const check = ParticipationStorageService.checkIsValid();
+    if (! check) {
+        this.$router.push({
+            name : "admin"
+        })
+    }
     this.question_id = this.$route.params.id;
     const response = await quizApiService.getQuestionById(this.question_id);
     this.question = response.data;
@@ -45,6 +51,13 @@ export default {
         }
     },
     Update(){
+      const check = ParticipationStorageService.checkIsValid();
+      if (! check) {
+          this.$router.push({
+              name : "admin"
+          })
+      }
+
         this.$router.push({
             name : "edit-question",
             params : {

@@ -68,8 +68,11 @@
             <input
                 type="file"
                 accept="image/jpeg/*"
-                
+                @change="convertToBase64($event)"
             />
+            <div v-if="image !== '' ">
+                <img v-if="image" :src="image" />
+            </div>
         </p> 
         <p>
             <button type="button" @click="Update" class="btn btn-success">Ajouter la question</button>
@@ -100,6 +103,13 @@ export default {
       }
   },
   async created() {
+    const check = ParticipationStorageService.checkIsValid();
+    if (! check) {
+        this.$router.push({
+            name : "admin"
+        })
+    }
+
     this.question_id = this.$route.params.id;
     const response = await QuizApiService.getQuestionById(this.question_id);
     const question = response.data;
@@ -121,14 +131,37 @@ export default {
   },
   methods : {
     async Update(){
+        const check = ParticipationStorageService.checkIsValid();
+        if (! check) {
+            this.$router.push({
+                name : "admin"
+            })
+        }
+        
         const data = this.CreateData();
         console.log(data);
         const token = ParticipationStorageService.getToken();
         var response = await QuizApiService.updateQuestion(this.question_id,data,token);
-        if (response == undefined) {
+        if (response === undefined) {
             this.$router.push("/admin");
         }
+        else {
+            this.$router.push({
+                name : "all-questions"
+            })
+        }
         console.log(response);
+    },
+    convertToBase64(event) {
+            const file = event.target.files[0];
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = () => {
+                this.image = reader.result;
+            };
+            reader.onerror = (error) => {
+                console.log('Error: ', error);
+            };
     },
     CreateData() {
         var response = {

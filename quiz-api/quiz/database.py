@@ -70,7 +70,7 @@ def retrieve_one_question(value,key = "id", path = PATH) :
     Union(Question, None) : return the object Question if something meets the criteria else None.
     """
     conn = log_db(path)
-    data = conn.execute(f"SELECT * FROM question WHERE {key}='{value}' ORDER BY position")
+    data = conn.execute(f"SELECT * FROM question WHERE ?=? ORDER BY position", (key, value))
     question = None
     # only 1 loop, because position and id are unique
     for row in data : 
@@ -134,7 +134,7 @@ def _delete_id_question(question_id, path = PATH) :
     """
     question = retrieve_one_question(question_id)
     conn = log_db(path)
-    conn.execute(f"DELETE FROM question WHERE id='{question_id}'")
+    conn.execute(f"DELETE FROM question WHERE id=?", (question_id,))
     conn.commit()
     conn.close()
     question_number = count_elements("question")
@@ -264,7 +264,6 @@ def get_answer_id(path=PATH) :
     Returns : 
     int : first id to give to the first answer of the question we want to add to the db. 
     """
-    conn = log_db(path)
     count = count_elements("question") - 1
     answer_id = 0
     question = retrieve_one_question(count) # get the latest question

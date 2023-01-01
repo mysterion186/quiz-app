@@ -70,10 +70,14 @@
                 accept="image/jpeg/*"
                 @change="convertToBase64($event)"
             />
+            <br />
+            <p>
+                <button type="button" @click="Send" class="btn btn-success">Ajouter la question</button>
+            </p>
+            <div v-if="image !== '' ">
+                <img v-if="image" :src="image" />
+            </div>
         </p> 
-        <p>
-            <button type="button" @click="Send" class="btn btn-success">Ajouter la question</button>
-        </p>
     </form>
 </template>
 
@@ -100,6 +104,14 @@ export default{
             possibleAnswers4Bool : false,
         }
     }, 
+    created(){
+        const check = ParticipationStorageService.checkIsValid();
+        if (! check) {
+            this.$router.push({
+                name : "admin"
+            })
+        }
+    },
     methods : {
         convertToBase64(event) {
             const file = event.target.files[0];
@@ -113,6 +125,12 @@ export default{
             };
         },
         async Send(){
+            const check = ParticipationStorageService.checkIsValid();
+            if (! check) {
+                this.$router.push({
+                    name : "admin"
+                })
+            }
             const data = this.CreateData();
             console.log(data);
             const token = ParticipationStorageService.getToken();

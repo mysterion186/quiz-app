@@ -7,7 +7,7 @@
 
 <script>
 import QuizApiService from '../../services/QuizApiService';
-
+import ParticipationStorageService from '../../services/ParticipationStorageService';
 export default{
     data() {
         return {
@@ -15,8 +15,16 @@ export default{
         }
     },
     async created(){
-        const questions = await QuizApiService.getQuestion("all");
-        this.questions = questions.data;
+        const check = ParticipationStorageService.checkIsValid();
+        if (check){
+            const questions = await QuizApiService.getQuestion("all");
+            this.questions = questions.data;
+        }
+        else{
+            this.$router.push({
+                name : "admin"
+            })
+        }
     },
     methods : {
         Detail(question) {

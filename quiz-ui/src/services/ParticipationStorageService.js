@@ -25,5 +25,34 @@ export default {
       },
       getToken() {
             return window.localStorage.getItem("token");
+      },
+      saveDate(){
+            const currentDate = new Date();
+            const dateString = currentDate.toLocaleString("fr-FR",{
+                        day: "2-digit",
+                        month: "2-digit",
+                        year: "numeric",
+                        hour: "2-digit",
+                        minute: "2-digit",
+                        second: "2-digit",
+                  });
+            window.localStorage.setItem("date",dateString);
+      },
+      checkIsValid(){
+            const specificDate = window.localStorage.getItem("date");
+            const currentDate = new Date();
+            const specificTimeInMilliseconds = new Date(specificDate).getTime();
+            const currentTimeInMilliseconds = currentDate.getTime();     
+            
+            const timeDifferenceInMilliseconds = currentTimeInMilliseconds - specificTimeInMilliseconds;
+            const timeDifferenceInHours = timeDifferenceInMilliseconds / (1000 * 60 * 60);
+
+            if (timeDifferenceInHours >= 1) {
+                  console.log("Le token est périmé");
+                  return false;
+            } else {
+                  console.log("Le token est valide");
+                  return true;
+            }
       }
     };

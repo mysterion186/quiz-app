@@ -10,6 +10,7 @@
         <p>
             <button type="button" @click="Connect" class="btn btn-success">Connexion</button>
         </p>
+        <div v-if="showErrorMsg">Mot de passe incorrect</div>
     </form>
 </template>
 
@@ -23,19 +24,34 @@ export default {
         return {
             username : "",
             password : "",
-            
+            showErrorMsg : false,
         }
     },
     methods : {
         async Connect() {
-            const response = await quizApiService.postLogin({
-                "username" : this.username,
-                "password" : this.password
-            });
-            const token = response.data["token"];
-            ParticipationStorageService.saveToken(token);
-            console.log(token);
-            this.$router.push("admin/all-questions")
+            var response;
+            try {
+                response = await quizApiService.postLogin({
+                    "username" : this.username,
+                    "password" : this.password
+                });
+            }
+            catch(error) {
+                console.log(error);
+            }
+            if (response === undefined) {
+                console.log("Mot de passe incorrect");
+                this.showErrorMsg = true;
+            }
+            else {
+                const token = response.data["token"];
+                ParticipationStorageService.saveToken(token);
+                ParticipationStorageService.saveDate();
+                console.log(token);
+                this.$router.push({
+                    name : "all-questions"
+                });
+            }
         }
     }
 }
