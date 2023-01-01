@@ -70,7 +70,7 @@ def retrieve_one_question(value,key = "id", path = PATH) :
     Union(Question, None) : return the object Question if something meets the criteria else None.
     """
     conn = log_db(path)
-    data = conn.execute(f"SELECT * FROM question WHERE ?=? ORDER BY position", (key, value))
+    data = conn.execute(f"SELECT * FROM question WHERE {key}=? ORDER BY position", (value,))
     question = None
     # only 1 loop, because position and id are unique
     for row in data : 
