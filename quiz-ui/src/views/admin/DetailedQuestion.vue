@@ -1,4 +1,6 @@
 <template>
+    <button type="button" style="margin-right: 10px;" @click="LogOut" class="btn btn-danger">Déconnexion</button>
+    <br/>
     <img style="width:500px; display:block;margin: 0 auto; height: 300px;"  v-if="question.image" :src="question.image" />
     <br />
     <h1>{{this.question.text}} - {{ this.question.position }} / {{ this.total}}</h1>
@@ -6,7 +8,7 @@
     <div class="container">
       <div class="row row-cols-2" >
         <div v-for="answer, index in this.question.possibleAnswers" v-bind:key="answer.id">
-        <div  style="border: 1px solid white; height: 70px; display: flex; align-items: center; justify-content: center; text-align: center; width: 610px">{{ answer.text }} </div>
+        <div style="border: 1px solid white; height: 70px; display: flex; align-items: center; justify-content: center; text-align: center; width: 610px">{{ answer.text }} </div>
         </div>
       </div>
     </div>
@@ -74,7 +76,13 @@ export default {
                 id : this.question_id
             }
         })
-    }
+    },
+    LogOut(){
+            ParticipationStorageService.logOut();
+            this.$router.push({
+                name:"HomePage"
+            })
+        }
   }
 };
 </script>

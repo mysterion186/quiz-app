@@ -54,5 +54,15 @@ export default {
                   console.log("Le token est valide");
                   return true;
             }
+      },
+      saveAnswersSummaries(answersSummaries) {
+            window.localStorage.setItem("answersSummaries", answersSummaries);
+      },
+      getAnswersSummaries(){
+            return window.localStorage.getItem("answersSummaries");
+      },
+      logOut(){
+            window.localStorage.removeItem("date");
+            window.localStorage.removeItem("token");
       }
     };

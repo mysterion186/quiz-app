@@ -1,5 +1,6 @@
 <template>
     <h1 style="text-align: center;"> Ajoutez une question ! </h1>
+    <button type="button" style="margin-right: 10px;" @click="LogOut" class="btn btn-danger">Déconnexion</button>
     <form>
         <p>
             <label class="form-label" >Thème de la question </label>
@@ -14,7 +15,7 @@
                     <input v-model.number="position" type="number" id="text" placeholder="Position" class='form-control' style="width: 600px">
                     
                     <label class="form-label" style="margin-top: 10px"  >Réponse 1 :
-                        <input v-model="possibleAnswers1Text" type="text" id="text" placeholder="Réponse 1" class='form-control' style="width: 600px">
+                        <textarea v-model="possibleAnswers1Text" type="text" id="text" placeholder="Réponse 1" class='form-control' style="width: 600px" required></textarea>
                         <label for="checkbox">Bonne réponse : </label>
                         <input 
                             type="checkbox" 
@@ -27,7 +28,7 @@
                     </label>
                     
                     <label class="form-label" >Réponse 2 :
-                        <input v-model="possibleAnswers2Text" type="text" id="text" placeholder="Réponse 2" class='form-control' style="width: 600px">
+                        <textarea v-model="possibleAnswers2Text" type="text" id="text" placeholder="Réponse 2" class='form-control' style="width: 600px" required></textarea>
                         <label for="checkbox">Bonne réponse : </label>
                         <input 
                             type="checkbox" 
@@ -41,7 +42,7 @@
                    
                     
                     <label class="form-label"  >Réponse 3 :
-                        <input v-model="possibleAnswers3Text" type="text" id="text" placeholder="Réponse 3" class='form-control' style="width: 600px">
+                        <textarea v-model="possibleAnswers3Text" type="text" id="text" placeholder="Réponse 3" class='form-control' style="width: 600px" required></textarea>
                         <label for="checkbox">Bonne réponse : </label>
                         <input 
                             type="checkbox" 
@@ -55,7 +56,7 @@
                     
                     
                     <label class="form-label"  >Réponse 4 :
-                        <input v-model="possibleAnswers4Text" type="text" id="text" placeholder="Réponse 4" class='form-control' style="width: 600px">
+                        <textarea v-model="possibleAnswers4Text" type="text" id="text" placeholder="Réponse 4" class='form-control' style="width: 600px" required></textarea>
                         <label for="checkbox">Bonne réponse : </label>
                         <input 
                             type="checkbox" 
@@ -68,7 +69,7 @@
                     </label>
             </div> 
             
-            <div class="right" style="margin-left: 70px">
+            <div class="right" style="margin-right: 70px">
                 <label class="form-label" >Image pour la question : </label>
                 <br />
                 <input
@@ -82,6 +83,9 @@
                 </div>
                 <br />
                 <p>
+                    <router-link to="/admin/all-questions">
+                        <button type="button" style="margin-right: 10px;" @click="Update" class="btn btn-danger">Annuler</button>
+                    </router-link>
                     <button type="button" @click="Send" class="btn btn-success">Ajouter la question</button>
                 </p>
             </div>
@@ -180,6 +184,12 @@ export default{
                 ]
             };
             return response;
+        },
+        LogOut(){
+            ParticipationStorageService.logOut();
+            this.$router.push({
+                name:"HomePage"
+            })
         }
     }
 }

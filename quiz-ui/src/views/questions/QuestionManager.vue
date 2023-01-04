@@ -1,5 +1,4 @@
 <template>
-      <h1 style="text-align: center;">Question manager</h1>
       <QuestionDisplayVue :question = "currentQuestion" :total = "totalNumberOfQuestions" @answer-selected = "answerClickedHandler" :key="this.currentQuestionPosition"/>
 </template>
 
@@ -53,6 +52,7 @@ export default {
             };
             const response = await quizApiService.postParticipation(data);
             ParticipationStorageService.saveParticipationScore(response.data["score"]);
+            ParticipationStorageService.saveAnswersSummaries(response.data["answersSummaries"]);
             this.$router.push('/recap');
         }
     },

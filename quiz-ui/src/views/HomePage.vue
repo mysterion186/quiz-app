@@ -2,11 +2,8 @@
   
   <h1 style="text-align: center;">Home page</h1>
   <br />
-  <div style="text-align: center;">
-    <router-link to="/NewQuiz">Démarrer le quiz !</router-link>
-  </div>
   <br />
-  <ul style="width:590px; margin: 0 auto;">
+  <div style="width:590px; height:300px; margin: 0 auto; overflow:hidden; overflow-y:scroll;" class="">
     <div v-for="scoreEntry in registeredScores" v-bind:key="scoreEntry.date" >
       <div class="container">
         <div class="row row-cols-2">
@@ -15,8 +12,11 @@
         </div>
       </div>
     </div>
-  </ul>
+  </div>
   
+  <div style="text-align: center; margin-top:25px;">
+    <router-link to="/NewQuiz"><button type="button" class="btn btn-success">Démarrer le quiz</button></router-link>
+  </div>
   <br />
   
   

@@ -8,7 +8,7 @@
       <div class="container">
         <div class="row row-cols-2" >
           <div v-for="answer, index in this.question.possibleAnswers" v-bind:key="answer.id">
-          <div  @click="selectedAnswer(index + 1)"  style="border: 1px solid white; height: 70px; display: flex; align-items: center; justify-content: center; text-align: center; width: 610px">{{ answer.text }} </div>
+          <div class="green_hover" @click="selectedAnswer(index + 1)"  style="border : 1px solid white; height: 70px; display: flex; align-items: center; justify-content: center; text-align: center; width: 610px">{{ answer.text }} </div>
           </div>
         </div>
       <!-- <li @click="selectedAnswer(index + 1)">{{ answer.text }} </li> -->
