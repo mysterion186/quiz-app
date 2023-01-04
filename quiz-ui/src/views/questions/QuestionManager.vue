@@ -1,5 +1,5 @@
 <template>
-      <h1>Question manager</h1>
+      <h1 style="text-align: center;">Question manager</h1>
       <QuestionDisplayVue :question = "currentQuestion" :total = "totalNumberOfQuestions" @answer-selected = "answerClickedHandler" :key="this.currentQuestionPosition"/>
 </template>
 

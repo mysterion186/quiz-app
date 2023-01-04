@@ -1,15 +1,15 @@
 <template>
   <br />
-  <div style="margin-left: 100px; "  >
+  <div style="text-align : center;"  >
     <h1 >Inscription</h1>
   </div>
 
   <br />
 
-  <form>
+  <form style="margin: 0 auto ">
   <p>
     <label class="form-label" >Nom du joueur : </label>
-    <input v-model="username" type="text" id="username" placeholder="Username" class='form-control'>
+    <input v-model="username" type="text" id="username" placeholder="Username" class='form-control' style="width : 400px">
   </p> 
   <p>
     <button type="button" @click="launchNewQuiz" class="btn btn-success">Envoyer</button>

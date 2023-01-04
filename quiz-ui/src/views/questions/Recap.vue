@@ -2,7 +2,9 @@
   <h1>
     {{ this.username }} ton score pour le jeu est de : {{ this.score }} !
   </h1>
-  <button type="button" @click="goBack" class="btn btn-success">Retour page d'accueil</button>
+  <br />
+  <button type="button" @click="goBack" class="btn btn-success" style="width: 450px; margin: 0 auto;">Retour page d'accueil</button>
+  <br />
 </template>
   
   <script>

@@ -1,8 +1,18 @@
 <template>
-    <h1>Listes toutes les questions;</h1>
-    <div v-for="question in questions" v-bind:key="question.id" @click="Detail(question.id)">
-      {{ question.title }} - {{ question.text }} - {{ question.position }}
+    <h1 style="text-align: center;">Listes toutes les questions :</h1>
+    <br />
+
+    <div v-for="question in questions" v-bind:key="question.id" @click="Detail(question.id)" style="margin: 0 auto">
+        <div class="container">
+            <div class="row row-cols-2" style="height: 60px; ">
+            <div class="col" style="text-align: center;width: 50px">{{ question.position }}</div>
+            <div class="col" style="text-align: center;width: 600px">{{ question.text }} </div>
+            </div>
+        </div>
     </div>
+    <br />
+    <button type="button" @click="Newquestion" class="btn btn-success" style="width: 200px; margin: 0 auto;">Nouvelle question</button>
+    <br />
 </template>
 
 <script>
@@ -34,7 +44,10 @@ export default{
                     id : question
                 }
             })
-        }
+        },
+        Newquestion(){
+            this.$router.push('/admin/add-question');
+        },
     }
 }
 </script>

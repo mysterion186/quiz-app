@@ -1,13 +1,23 @@
 <template>
-    <img v-if="question.image" :src="question.image" />
+    <img style="width:500px; display:block;margin: 0 auto; height: 300px;"  v-if="question.image" :src="question.image" />
     <br />
     <h1>{{this.question.text}} - {{ this.question.position }} / {{ this.total}}</h1>
     <br />
-    <div v-for="answer, index in this.question.possibleAnswers" v-bind:key="answer.id">
-      <li>{{ answer.text }} </li>
+    <div class="container">
+      <div class="row row-cols-2" >
+        <div v-for="answer, index in this.question.possibleAnswers" v-bind:key="answer.id">
+        <div  style="border: 1px solid white; height: 70px; display: flex; align-items: center; justify-content: center; text-align: center; width: 610px">{{ answer.text }} </div>
+        </div>
+      </div>
     </div>
-    <button type="button" @click="Delete" class="btn btn-success">Supprimer la question</button>
-    <button type="button" @click="Update" class="btn btn-success">Modifier la question</button>
+    <br />
+    <div class="container">
+      <div class="row row-cols-2" style="justify-content: center; margin-left: 12px;" >
+        <button type="button" @click="Delete" class="btn btn-success" style="width: 300px; margin-right: 10px;" >Supprimer la question</button>
+        <button type="button" @click="Update" class="btn btn-success" style="width: 300px; ">Modifier la question</button>
+      </div>
+    </div>
+    <br />
 </template>
 
 <script>
