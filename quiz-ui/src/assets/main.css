@@ -85,3 +85,13 @@ Not supports in Firefox and IE */
 .temp{
   background-color: rgba(249, 5, 5, 0.402)
 }
+
+nav {
+  padding-top: 0px;
+  position: fixed;
+  width: 100%;
+  top: 0;
+  left: 0;
+  z-index: 9999;
+  margin-bottom: 20px;
+}

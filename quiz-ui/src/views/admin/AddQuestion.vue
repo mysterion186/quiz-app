@@ -4,16 +4,15 @@
     <form>
         <p>
             <label class="form-label" >Thème de la question </label>
-            <input v-model="title" type="text" id="title" placeholder="Thème" class='form-control'>
+            <input v-model="title" type="text" id="title" placeholder="Thème" class='form-control' required >
             
             <label class="form-label" style="margin-top: 10px"  >Intitulé de la question : </label>
             <input v-model="text" type="text" id="text" placeholder="intitulé" class='form-control'>
         </p>    
-            <form style="display: flex; justofy-content: space-between;"> 
+            <form style="display: flex; justify-content: space-between;"> 
                 <div class="left">            
                     <label class="form-label" style="margin-top: 10px"  >Position dans le quiz : </label>
-                    <input v-model.number="position" type="number" id="text" placeholder="Position" class='form-control' style="width: 600px">
-                    
+                    <input v-model.number="position" type="number" id="text" placeholder="Position" class='form-control' style="width: 600px" required>
                     <label class="form-label" style="margin-top: 10px"  >Réponse 1 :
                         <textarea v-model="possibleAnswers1Text" type="text" id="text" placeholder="Réponse 1" class='form-control' style="width: 600px" required></textarea>
                         <label for="checkbox">Bonne réponse : </label>

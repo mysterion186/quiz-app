@@ -1,6 +1,6 @@
 <template>
     <h1 style="text-align: center;">Listes toutes les questions :</h1>
-    <button type="button" style="margin-right: 10px;" @click="LogOut" class="btn btn-danger">Déconnexion</button>
+    det
     <br />
 
     <div v-for="question in questions" v-bind:key="question.id" @click="Detail(question.id)" style="margin: 0 auto">
@@ -54,6 +54,15 @@ export default{
             this.$router.push({
                 name:"HomePage"
             })
+        },
+        DelParticipations(){
+            const token = ParticipationStorageService.getToken();
+            QuizApiService.deleteParticipation(token);
+        },
+        DelQuestions(){
+            const token = ParticipationStorageService.getToken();
+            QuizApiService.deleteQuestion("all", token);
+            this.$router.go()
         }
     }
 }

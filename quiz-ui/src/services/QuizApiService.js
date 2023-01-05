@@ -50,5 +50,8 @@ export default {
   },
   deleteQuestion(id, token){
     return this.call("delete","questions/"+id, null,token);
+  },
+  deleteParticipation(token){
+    return this.call("delete","participations/all",null,token);
   }
 };

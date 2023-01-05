@@ -30,6 +30,14 @@ export default {
             showErrorMsg : false,
         }
     },
+    created(){
+        const check = ParticipationStorageService.checkIsValid();
+        if (check){
+            this.$router.push({
+                "name" : "all-questions"
+            });
+        }
+    },
     methods : {
         async Connect() {
             var response;

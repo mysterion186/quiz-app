@@ -1,5 +1,8 @@
 <template>
-    <button type="button" style="margin-right: 10px;" @click="LogOut" class="btn btn-danger">Déconnexion</button>
+    <div style="display: flex; flex-direction: row; justify-content: center; margin-top: 20px;">
+      <button type="button" style="margin-right: 10px;" @click="this.$router.go(-1)" class="btn btn-info">Revenir en arrière</button>
+        <button type="button" style="margin-right: 10px;" @click="LogOut" class="btn btn-danger">Déconnexion</button>
+    </div>
     <br/>
     <img style="width:500px; display:block;margin: 0 auto; height: 300px;"  v-if="question.image" :src="question.image" />
     <br />
@@ -35,6 +38,7 @@ export default {
   },
   async created() {
     const check = ParticipationStorageService.checkIsValid();
+    console.log("Depuis created ",check);
     if (! check) {
         this.$router.push({
             name : "admin"
@@ -55,12 +59,13 @@ export default {
             console.log(error);
         }
         // console.log(response);
-        if (response === undefined) {
-            this.$router.push("/admin");
-        }
-        else {
-            this.$router.push("/admin/all-questions")
-        }
+        // if (response === undefined) {
+        //     this.$router.push("/admin");
+        // }
+        // else {
+        //     this.$router.push("/admin/all-questions")
+        // }
+        this.$router.push("/admin/all-questions");
     },
     Update(){
       const check = ParticipationStorageService.checkIsValid();
