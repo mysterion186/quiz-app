@@ -40,18 +40,12 @@ export default {
     },
     methods : {
         async Connect() {
-            var response;
-            try {
-                response = await quizApiService.postLogin({
+            var response = await quizApiService.postLogin({
                     "username" : this.username,
                     "password" : this.password
                 });
-            }
-            catch(error) {
-                console.log(error);
-            }
-            if (response === undefined) {
-                console.log("Mot de passe incorrect");
+            const status = response.status;
+            if (status === 401){
                 this.showErrorMsg = true;
             }
             else {
