@@ -25,7 +25,7 @@ Dans les tests actuels, on ne cherche pas à récupérer le token ainsi il faut 
 
 
 ## Lancement du projet en production (Collection `Data Generation.postman_collection.json`)
-La preimière étape est d'importer la collection fournie pour générer les différents éléments de notre projet.  
+La première étape est d'importer la collection fournie pour générer les différents éléments de notre projet. Le fichier nécessaire se trouve à la racine du projet.  
 Le premier dossier aura pour but de créer les tables vides (car la base de données est vide au lancement).  
 Le second dossier aura pour but d'ajouter les questions dans la base de données.  
 Le dernier dossier (factultatif) a pour but de créer des "fausses" participations pour notre quiz.
