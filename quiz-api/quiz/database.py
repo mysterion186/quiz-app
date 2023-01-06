@@ -349,7 +349,7 @@ def check_parameter(payload) :
             elif payload[elt] == [] and elt == "possibleAnswers" : 
                 missing_params.append(elt)
             elif elt == "possibleAnswers" and payload[elt] != [] :
-                if elt == "possibleAnswers" and len(payload[elt]) != 4 : missing_params.append("possibleAnswers")
+                # if elt == "possibleAnswers" and len(payload[elt]) != 4 : missing_params.append("possibleAnswers")
                 wrongAnswers = 0 
                 for answer in payload[elt]:
                     if answer["text"] == "" and elt not in missing_params : 
