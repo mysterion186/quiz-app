@@ -379,7 +379,6 @@ def get_max_id(path = PATH):
     try : 
         data = conn.execute("SELECT * FROM question order by id DESC")
         for row in data : 
-            print(row[0])
             question_id = row[0]
             break
     except Exception as e : 
@@ -393,11 +392,9 @@ def get_max_pos(current_pos,path = PATH):
     conn = log_db(path)
     question_pos = None
     try : 
-        data = conn.execute("SELECT * FROM question order by position DESC")
-        for row in data : 
-            print(row[0])
-            question_pos = row[0]
-            break
+        data = conn.execute("SELECT * FROM question order by position ASC")
+        positions = [elt[4] for elt in data]
+        question_pos = max(positions)
     except Exception as e : 
         print(e)
     finally : 

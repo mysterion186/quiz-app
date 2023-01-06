@@ -76,8 +76,9 @@ def add_questions() :
                             possibleAnswers = payload["possibleAnswers"]
                         )
         # avoid having questions with different position (1, 2, 3, 7, 8, ...)
-        if question.position > question.id : 
-            question.position = question.id
+        # if question.position > question.id : 
+        #     question.position = question.id
+        print("position de la question ",question.position)
         question_number = database.count_elements("question")
         question.possibleAnswers = database.add_id_to_answer(question.possibleAnswers)
         database.update_position(None, question, question_number, "insert")
