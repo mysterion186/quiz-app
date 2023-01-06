@@ -1,6 +1,7 @@
 <template>
     <h1 style="text-align: center;">Page édition question</h1>
     <button type="button" style="margin-right: 10px;" @click="LogOut" class="btn btn-danger">Déconnexion</button>
+    <div v-if="showErrorMsg" style="font-size: 16px; color: red"> Remplissez les champs manquants : {{ missingParams }}</div>
     <form>
         <p>
             <label class="form-label" >Thème de la question </label>
@@ -13,11 +14,11 @@
             <form style="display: flex; justofy-content: space-between;">
                 <div class="left">
                     <label class="form-label" style="margin-top: 10px"  >Position dans le quiz : </label>
-                    <input v-model.number="position" type="number" id="text" placeholder="Position" class='form-control' style="width: 600px">
+                    <input v-model.number="position" type="number" id="position" placeholder="Position" class='form-control' style="width: 600px">
                     
                     <label class="form-label" style="margin-top: 10px" >Réponse 1 :
-                        <textarea v-model="possibleAnswers1Text" type="text" id="text" placeholder="Réponse 1" class='form-control' style="width: 600px;"></textarea>
-                        <label for="checkbox">Bonne réponse : </label>
+                        <textarea v-model="possibleAnswers1Text" type="text" id="possibleAnswers" placeholder="Réponse 1" class='form-control' style="width: 600px;"></textarea>
+                        <label for="checkbox" id="checkbox">Bonne réponse : </label>
                         <input 
                             type="checkbox" 
                             id="checkbox1" 
@@ -29,8 +30,8 @@
                     <br />
                     
                     <label class="form-label" >Réponse 2 :
-                        <textarea v-model="possibleAnswers2Text" type="text" id="text" placeholder="Réponse 2" class='form-control' style="width: 600px;"></textarea>
-                        <label for="checkbox">Bonne réponse : </label>
+                        <textarea v-model="possibleAnswers2Text" type="text" id="possibleAnswers" placeholder="Réponse 2" class='form-control' style="width: 600px;"></textarea>
+                        <label for="checkbox" id="checkbox">Bonne réponse : </label>
                         <input 
                             type="checkbox" 
                             id="checkbox2" 
@@ -42,8 +43,8 @@
                     <br />
                     
                     <label class="form-label" >Réponse 3 :
-                        <textarea v-model="possibleAnswers3Text" type="text" id="text" placeholder="Réponse 3" class='form-control' style="width: 600px;"></textarea>
-                        <label for="checkbox">Bonne réponse : </label>
+                        <textarea v-model="possibleAnswers3Text" type="text" id="possibleAnswers" placeholder="Réponse 3" class='form-control' style="width: 600px;"></textarea>
+                        <label for="checkbox" id="checkbox">Bonne réponse : </label>
                         <input 
                             type="checkbox" 
                             id="checkbox3" 
@@ -56,8 +57,8 @@
                     <br />
                     
                     <label class="form-label" >Réponse 4 :
-                        <textarea v-model="possibleAnswers4Text" type="text" id="text" placeholder="Réponse 4" class='form-control' style="width: 600px;"></textarea>
-                        <label for="checkbox">Bonne réponse : </label>
+                        <textarea v-model="possibleAnswers4Text" type="text" id="possibleAnswers" placeholder="Réponse 4" class='form-control' style="width: 600px;"></textarea>
+                        <label for="checkbox" id="checkbox">Bonne réponse : </label>
                         <input 
                             type="checkbox" 
                             id="checkbox4" 
@@ -117,6 +118,9 @@ export default {
         possibleAnswers2Bool : false,
         possibleAnswers3Bool : false,
         possibleAnswers4Bool : false,
+        showErrorMsg : false,
+        missingParams : "",
+        missingParamsArry : [],
       }
   },
   async created() {
@@ -156,18 +160,62 @@ export default {
         }
         
         const data = this.CreateData();
-        console.log(data);
         const token = ParticipationStorageService.getToken();
         var response = await QuizApiService.updateQuestion(this.question_id,data,token);
-        if (response === undefined) {
+        console.log(response);
+        var status = response.status;
+        if (status === 422){
+            const required_params = ["title","text","image","position","possibleAnswers","Au moins une bonne réponse !"]; 
+            required_params.forEach(element => {
+            if (element === "Au moins une bonne réponse !"){
+                const elt_array = document.querySelectorAll("#checkbox");
+                elt_array.forEach(elt => { 
+                    console.log(elt.style.border)
+                    if (elt.style.border){
+                        elt.style.removeProperty("border");
+                    }
+                })
+            }
+            else {
+                    const elt_array = document.querySelectorAll("#"+element);
+                    elt_array.forEach(elt => { 
+                        console.log(elt.style.border)
+                        if (elt.style.border){
+                            elt.style.removeProperty("border");
+                        }
+                    })
+                }
+            })
+            this.showErrorMsg = true;
+            this.missingParamsArry = response.data["missing_params"];
+            console.log(this.missingParamsArry);
+            response.data["missing_params"].forEach(element => {
+                if (element === "Au moins une bonne réponse !"){
+                    const elt_array = document.querySelectorAll("#checkbox");
+                    elt_array.forEach(elt => {
+                        elt.style.border = "5px solid red"
+                    })
+                }
+                else {
+                    const elt_array = document.querySelectorAll("#"+element);
+                    elt_array.forEach(elt => {
+                        elt.style.border = "5px solid red"
+                    })
+                }
+            });
+            this.missingParams = response.data["missing_params"].join();
+            console.log("Il manque les données : ", this.missingParams);
+        }
+        else if (status === 200) {
+            console.log("tout est bon");
+            this.$router.push({
+                    name : "all-questions"
+                });
+            }
+        else{
+            console.log("error admin");
             this.$router.push("/admin");
         }
-        else {
-            this.$router.push({
-                name : "all-questions"
-            })
-        }
-        console.log(response);
     },
     convertToBase64(event) {
             const file = event.target.files[0];

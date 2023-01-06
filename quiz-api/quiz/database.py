@@ -29,10 +29,16 @@ def count_elements(table, path=PATH) :
     int : number of elements in the given table.
     """
     conn = log_db(path)
-    result = conn.execute("Select count(*) from {0}".format(table))
-    for row in result : 
-        return row[0] + 1
-    conn.close()
+    try : 
+        result = conn.execute("Select count(*) from {0}".format(table))
+        count = None
+        for row in result : 
+            count = row[0] + 1
+    except Exception as e : 
+        print(e)
+    finally : 
+        conn.close()
+        return count
 
 def insert_question(question,path = PATH) : 
     """Function to insert a new question into the database.
@@ -45,16 +51,32 @@ def insert_question(question,path = PATH) :
     None
     """
     conn = log_db(path)
-    conn.execute('INSERT INTO question(id,title, text, image, position, possibleAnswers) VALUES (?,?,?,?,?,?)',(
-                                                                                                                question.id,
-                                                                                                                question.title, 
-                                                                                                                question.text,
-                                                                                                                question.image,
-                                                                                                                question.position,
-                                                                                                                json.dumps(question.possibleAnswers,ensure_ascii=False)
-                                                                                                            ))
-    conn.commit()
-    conn.close()
+    try : 
+        conn.execute('INSERT INTO question(id,title, text, image, position, possibleAnswers) VALUES (?,?,?,?,?,?)',(
+                                                                                                                    question.id,
+                                                                                                                    question.title, 
+                                                                                                                    question.text,
+                                                                                                                    question.image,
+                                                                                                                    question.position,
+                                                                                                                    json.dumps(question.possibleAnswers,ensure_ascii=False)
+                                                                                                                ))
+        conn.commit()
+    except Exception as e:
+        try : 
+            question.id = question.id + 1
+            conn.execute('INSERT INTO question(id,title, text, image, position, possibleAnswers) VALUES (?,?,?,?,?,?)',(
+                                                                                                                    question.id,
+                                                                                                                    question.title, 
+                                                                                                                    question.text,
+                                                                                                                    question.image,
+                                                                                                                    question.position,
+                                                                                                                    json.dumps(question.possibleAnswers,ensure_ascii=False)
+                                                                                                                ))
+            conn.commit() 
+        except Exception as e : 
+            print(e)  
+    finally : 
+        conn.close()
     return
 
 # récupérer l'image en base 64 et l'enregistrer sous forme de texte
@@ -70,21 +92,27 @@ def retrieve_one_question(value,key = "id", path = PATH) :
     Union(Question, None) : return the object Question if something meets the criteria else None.
     """
     conn = log_db(path)
-    data = conn.execute(f"SELECT * FROM question WHERE {key}=? ORDER BY position", (value,))
-    question = None
-    # only 1 loop, because position and id are unique
-    for row in data : 
-        question = Question(
-                            id = row[0],
-                            title = row[1],
-                            text = row[2],
-                            image = row[3],
-                            position = row[4],
-                            possibleAnswers = row[5]
-                        )
-        question.possibleAnswers = json.loads(question.possibleAnswers)
-    conn.close()
-    return question
+    try : 
+        data = conn.execute(f"SELECT * FROM question WHERE {key}=? ORDER BY position", (value,))
+        question = None
+        # only 1 loop, because position and id are unique
+        for row in data : 
+            question = Question(
+                                id = row[0],
+                                title = row[1],
+                                text = row[2],
+                                image = row[3],
+                                position = row[4],
+                                possibleAnswers = row[5]
+                            )
+            question.possibleAnswers = json.loads(question.possibleAnswers)
+        conn.close()
+        return question
+    except Exception as e:
+        print(e)
+    finally : 
+        conn.close()
+    return
 
 def retrieve_all_question(count, key = 'id', path = PATH):
     """
@@ -134,11 +162,15 @@ def _delete_id_question(question_id, path = PATH) :
     """
     question = retrieve_one_question(question_id)
     conn = log_db(path)
-    conn.execute(f"DELETE FROM question WHERE id=?", (question_id,))
-    conn.commit()
-    conn.close()
-    question_number = count_elements("question")
-    update_position(None, question,question_number, "delete")
+    try : 
+        conn.execute(f"DELETE FROM question WHERE id=?", (question_id,))
+        conn.commit()
+        question_number = count_elements("question")
+        update_position(None, question,question_number, "delete")
+    except Exception as e:
+        print(e)
+    finally : 
+        conn.close()
     return
 
 def _delete_all_questions(path = PATH) : 
@@ -152,9 +184,13 @@ def _delete_all_questions(path = PATH) :
     None
     """
     conn = log_db(path)
-    conn.execute(f"DELETE FROM question")
-    conn.commit()
-    conn.close()
+    try :
+        conn.execute(f"DELETE FROM question")
+        conn.commit()
+    except Exception as e:
+        print(e)
+    finally :
+        conn.close()
     return
 
 
@@ -170,23 +206,27 @@ def update_question(question, path = PATH) :
     None
     """
     conn = log_db(path)
-    conn.execute("""
-            UPDATE question SET title = ?, 
-                                text = ?,
-                                image = ?,
-                                position = ?,
-                                possibleAnswers = ?
-            WHERE id = ?
-    """, (
-        question.title,
-        question.text,
-        question.image,
-        question.position,
-        json.dumps(question.possibleAnswers, ensure_ascii=False),
-        question.id
-    ))
-    conn.commit()
-    conn.close()
+    try : 
+        conn.execute("""
+                UPDATE question SET title = ?, 
+                                    text = ?,
+                                    image = ?,
+                                    position = ?,
+                                    possibleAnswers = ?
+                WHERE id = ?
+        """, (
+            question.title,
+            question.text,
+            question.image,
+            question.position,
+            json.dumps(question.possibleAnswers, ensure_ascii=False),
+            question.id
+        ))
+        conn.commit()
+    except Exception as e:
+        print(e)
+    finally : 
+        conn.close()
     return
 
 def update_position(previous_pos, question, question_number,action_type) : 
@@ -287,3 +327,34 @@ def add_id_to_answer(possibleAnswers, path=PATH) :
         elt["id"] = first_id
         first_id += 1
     return possibleAnswers
+
+def check_parameter(payload) : 
+    """
+    Check if all the parameter for creating a question are here.
+
+    Args : 
+    payload (dict) : request sent by the admin.
+
+    Returns : 
+    list : return the list with all the missing parameters
+    """
+    missing_params = []
+    required_params = ["title","text","image","position","possibleAnswers"]
+    for elt in required_params:
+        if elt not in payload :
+            missing_params.append(elt)
+        else : 
+            if payload[elt] == "" and elt != "possibleAnswers" : 
+                missing_params.append(elt)
+            elif payload[elt] == [] and elt == "possibleAnswers" : 
+                missing_params.append(elt)
+            elif elt == "possibleAnswers" and payload[elt] != [] :
+                if elt == "possibleAnswers" and len(payload[elt]) != 4 : missing_params.append("possibleAnswers")
+                wrongAnswers = 0 
+                for answer in payload[elt]:
+                    if answer["text"] == "" and elt not in missing_params : 
+                        missing_params.append(elt)
+                    if not answer["isCorrect"] : wrongAnswers += 1
+                # case all answer are wrong
+                if wrongAnswers == len(payload[elt]) : missing_params.append("Au moins une bonne réponse !")
+    return missing_params

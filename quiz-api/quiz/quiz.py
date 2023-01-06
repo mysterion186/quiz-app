@@ -61,6 +61,12 @@ def add_questions() :
         jwt.decode_token(token)
         payload = request.get_json()
         count = int(database.count_elements("question"))
+        # check if all parameters are present to create a new question
+        missing_params = database.check_parameter(payload)
+        if missing_params == []:
+            print("parfait il manque rien")
+        else : 
+            return {"missing_params": missing_params}, 422
         question = models.Question(
                             id = count,
                             title = payload["title"],
@@ -69,6 +75,9 @@ def add_questions() :
                             position = payload["position"],
                             possibleAnswers = payload["possibleAnswers"]
                         )
+        # avoid having questions with different position (1, 2, 3, 7, 8, ...)
+        if question.position > question.id : 
+            question.position = question.id
         question_number = database.count_elements("question")
         question.possibleAnswers = database.add_id_to_answer(question.possibleAnswers)
         database.update_position(None, question, question_number, "insert")
@@ -185,6 +194,12 @@ def update_question(question_id) :
         return "Not Found", 404
     previous_pos = question.position
     question_number = database.count_elements("question")
+    # check if all parameters are present to create a new question
+    missing_params = database.check_parameter(payload)
+    if missing_params == []:
+        print("parfait il manque rien")
+    else : 
+        return {"missing_params": missing_params}, 422
     # Update question, don't take in account the position handling error (position > number of questions)
     question.title = payload['title']
     question.image = payload["image"]
@@ -192,6 +207,9 @@ def update_question(question_id) :
     question.position = payload["position"]
     question.possibleAnswers = payload["possibleAnswers"]
     question.possibleAnswers = database.add_id_to_answer(question.possibleAnswers)
+    # avoid having questions with different position (1, 2, 3, 7, 8, ...)
+    if question.position > question_number : 
+        question.position = question_number - 1 
     # database.update_question(question)
     if previous_pos != question.position :
         database.update_position(previous_pos, question, question_number, "update")

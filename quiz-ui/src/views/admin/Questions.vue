@@ -1,6 +1,5 @@
 <template>
     <h1 style="text-align: center;">Listes toutes les questions :</h1>
-    det
     <br />
 
     <div v-for="question in questions" v-bind:key="question.id" @click="Detail(question.id)" style="margin: 0 auto">
