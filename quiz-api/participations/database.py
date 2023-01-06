@@ -27,9 +27,13 @@ def delete_participation(path = PATH) :
     None
     """
     conn = log_db(path)
-    conn.execute("DELETE FROM participation")
-    conn.commit()
-    conn.close()
+    try : 
+        conn.execute("DELETE FROM participation")
+        conn.commit()
+    except Exception as e :
+        print(e)
+    finally : 
+        conn.close()
     return
 
 def insert_participation(participation,path = PATH) :
@@ -44,13 +48,17 @@ def insert_participation(participation,path = PATH) :
     None
     """
     conn = log_db(path)
-    conn.execute("INSERT INTO participation(player_name, score, date) VALUES (?,?,?)", (
-                                                                                        participation.playerName,
-                                                                                        participation.score,
-                                                                                        participation.date
-                                                                                    ))
-    conn.commit()
-    conn.close()
+    try : 
+        conn.execute("INSERT INTO participation(player_name, score, date) VALUES (?,?,?)", (
+                                                                                            participation.playerName,
+                                                                                            participation.score,
+                                                                                            participation.date
+                                                                                        ))
+        conn.commit()
+    except Exception as e :
+        print(e)
+    finally : 
+        conn.close()
     return
 
 def retrieve_all_participations(path = PATH):
@@ -64,13 +72,18 @@ def retrieve_all_participations(path = PATH):
     list(Participation) : list that contains all the Participation that are in the database.
     """
     conn = log_db(path)
-    data = conn.execute("SELECT * FROM participation ORDER BY score DESC")
-    participations = []
-    for row in data : 
-        participation = Participation(
-            playerName = row[1],
-            score = row[2],
-            date = row[3]
-        )
-        participations.append(json.loads(participation.toJson()))
+    try : 
+        data = conn.execute("SELECT * FROM participation ORDER BY score DESC")
+        participations = []
+        for row in data : 
+            participation = Participation(
+                playerName = row[1],
+                score = row[2],
+                date = row[3]
+            )
+            participations.append(json.loads(participation.toJson()))
+    except Exception as e :
+        print(e)
+    finally : 
+        conn.close()
     return participations

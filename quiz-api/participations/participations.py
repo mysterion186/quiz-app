@@ -47,14 +47,14 @@ def participate():
         return "Not same lenght", 400
     
     # list all questions, to calculate user's score.
-    questions = q_database.retrieve_all_question(number_question + 1)
+    questions = q_database.retrieve_all_question()
     score = 0
     answersSummaries = []
     for k in range(len(questions)):
         correct_position = q_database.get_correct_answer_pos(questions[k])
         if  correct_position == answers[k]:
             score += 1
-        answersSummaries.append([correct_position, answers[k]])
+        answersSummaries.append([correct_position, correct_position == answers[k]])
     # create the users Participation object to store it.
     now = datetime.now()
     formatted_date_time = now.strftime("%d/%m/%Y %H:%M:%S")

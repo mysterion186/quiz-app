@@ -60,15 +60,25 @@ def add_questions() :
     try : 
         jwt.decode_token(token)
         payload = request.get_json()
-        count = int(database.count_elements("question"))
+        # check if all parameters are present to create a new question
+        missing_params = database.check_parameter(payload)
+        pot_id = database.get_max_id() + 1
+        if missing_params == []:
+            print("parfait il manque rien")
+        else : 
+            return {"missing_params": missing_params}, 422
         question = models.Question(
-                            id = count,
+                            id = pot_id,
                             title = payload["title"],
                             text = payload["text"],
                             image = payload["image"],
-                            position = payload["position"],
+                            position = database.get_max_pos(payload["position"]),
                             possibleAnswers = payload["possibleAnswers"]
                         )
+        # avoid having questions with different position (1, 2, 3, 7, 8, ...)
+        # if question.position > question.id : 
+        #     question.position = question.id
+        print("position de la question ",question.position)
         question_number = database.count_elements("question")
         question.possibleAnswers = database.add_id_to_answer(question.possibleAnswers)
         database.update_position(None, question, question_number, "insert")
@@ -144,11 +154,16 @@ def get_questions_by_position():
     Returns :
     tuple(Union[dict, str], int) : the dictionnay is the serialized quesiton, str is error message
     """
-    pos_id = int(request.args.get("position"))
-    question = database.retrieve_one_question(pos_id, key="position")
-    if question == None : 
-        return "Not Found",404
-    return question.toJson(), 200
+    try :  
+        pos_id = int(request.args.get("position")) 
+        question = database.retrieve_one_question(pos_id, key="position") 
+        if question == None :  
+            return "Not Found",404 
+        return question.toJson(), 200 
+    except :  
+        count = database.count_elements("question") 
+        questions = database.retrieve_all_question() 
+        return [json.loads(elt.toJson()) for elt in questions], 200 
 
 @quiz.route("/questions/<question_id>", methods=["PUT"])
 def update_question(question_id) : 
@@ -180,6 +195,12 @@ def update_question(question_id) :
         return "Not Found", 404
     previous_pos = question.position
     question_number = database.count_elements("question")
+    # check if all parameters are present to create a new question
+    missing_params = database.check_parameter(payload)
+    if missing_params == []:
+        print("parfait il manque rien")
+    else : 
+        return {"missing_params": missing_params}, 422
     # Update question, don't take in account the position handling error (position > number of questions)
     question.title = payload['title']
     question.image = payload["image"]
@@ -187,6 +208,9 @@ def update_question(question_id) :
     question.position = payload["position"]
     question.possibleAnswers = payload["possibleAnswers"]
     question.possibleAnswers = database.add_id_to_answer(question.possibleAnswers)
+    # avoid having questions with different position (1, 2, 3, 7, 8, ...)
+    if question.position > question_number : 
+        question.position = question_number - 1 
     # database.update_question(question)
     if previous_pos != question.position :
         database.update_position(previous_pos, question, question_number, "update")

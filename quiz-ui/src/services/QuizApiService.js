@@ -24,7 +24,7 @@ export default {
         return { status: response.status, data: response.data };
       })
       .catch((error) => {
-        console.error(error);
+        return { status: error.response.status, data : error.response.data};
       });
   },
   getQuizInfo() {
@@ -32,5 +32,26 @@ export default {
   },
   getQuestion(position) {
     return this.call("get","questions?position="+position);
+  },
+  getQuestionById(id) {
+    return this.call("get","questions/"+id);
+  },
+  postParticipation(data){
+    return this.call("post", "participations", data = data);
+  },
+  postLogin(data){
+    return this.call("post", "login", data = data);
+  },
+  postAddQuestion(data, token){
+    return this.call("post", "questions", data = data, token = token);
+  },
+  updateQuestion(id,data, token){
+    return this.call("put","questions/"+id, data = data, token = token);
+  },
+  deleteQuestion(id, token){
+    return this.call("delete","questions/"+id, null,token);
+  },
+  deleteParticipation(token){
+    return this.call("delete","participations/all",null,token);
   }
 };
