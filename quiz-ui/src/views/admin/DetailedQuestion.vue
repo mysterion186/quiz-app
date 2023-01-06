@@ -52,12 +52,12 @@ export default {
     async Delete(){
         const user_token = ParticipationStorageService.getToken();
         var response;
-        try {
-            response = await quizApiService.deleteQuestion(this.question_id,user_token);
-        }
-        catch(error) {
-            console.log(error);
-        }
+        console.log(this.question_id);
+
+          response = await quizApiService.deleteQuestion(this.question_id,user_token).then(
+            response => {console.log(response);}
+          ).catch(error => {console.log(error);});
+        
         // console.log(response);
         // if (response === undefined) {
         //     this.$router.push("/admin");

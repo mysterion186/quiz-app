@@ -86,7 +86,7 @@ Not supports in Firefox and IE */
   background-color: rgba(249, 5, 5, 0.402)
 }
 
-nav {
+/* nav {
   padding-top: 0px;
   position: fixed;
   width: 100%;
@@ -94,4 +94,4 @@ nav {
   left: 0;
   z-index: 9999;
   margin-bottom: 20px;
-}
+} */

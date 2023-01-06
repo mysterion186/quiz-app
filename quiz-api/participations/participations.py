@@ -47,7 +47,7 @@ def participate():
         return "Not same lenght", 400
     
     # list all questions, to calculate user's score.
-    questions = q_database.retrieve_all_question(number_question + 1)
+    questions = q_database.retrieve_all_question()
     score = 0
     answersSummaries = []
     for k in range(len(questions)):

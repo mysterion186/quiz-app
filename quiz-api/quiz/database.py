@@ -114,7 +114,7 @@ def retrieve_one_question(value,key = "id", path = PATH) :
         conn.close()
     return
 
-def retrieve_all_question(count, key = 'id', path = PATH):
+def retrieve_all_question(path = PATH):
     """
     Get all questions that goes from 0 to count.
 
@@ -127,10 +127,24 @@ def retrieve_all_question(count, key = 'id', path = PATH):
     list(Questions) : return all the Questions that met our research criteria. 
     """
     questions = []
-    for k in range(count):
-        temp = retrieve_one_question(k, key, path)
-        if temp != None : 
-            questions.append(temp)
+    conn = log_db(path)
+    try : 
+        data = conn.execute("SELECT * FROM question order by position")
+        for row in data : 
+            question = Question(
+                                id = row[0],
+                                title = row[1],
+                                text = row[2],
+                                image = row[3],
+                                position = row[4],
+                                possibleAnswers = row[5]
+                            )
+            question.possibleAnswers = json.loads(question.possibleAnswers)
+            questions.append(question)
+    except Exception as e:
+        print(e)
+    finally : 
+        conn.close()
     return questions
 
 def delete_question(rule) : 
@@ -241,7 +255,7 @@ def update_position(previous_pos, question, question_number,action_type) :
     question_number (int) : Number of questions in total in the question table.
     action_type (str) : What action to perform. [update, insert, delete]
     """
-    questions = retrieve_all_question(question_number)
+    questions = retrieve_all_question()
     # update or insert the new question
     if action_type == "update" : 
         update_question(question)
@@ -358,3 +372,39 @@ def check_parameter(payload) :
                 # case all answer are wrong
                 if wrongAnswers == len(payload[elt]) : missing_params.append("Au moins une bonne réponse !")
     return missing_params
+
+def get_max_id(path = PATH):
+    conn = log_db(path)
+    question_id = None
+    try : 
+        data = conn.execute("SELECT * FROM question order by id DESC")
+        for row in data : 
+            print(row[0])
+            question_id = row[0]
+            break
+    except Exception as e : 
+        print(e)
+    finally : 
+        conn.close()
+        if question_id == None : return 0
+        else : return question_id
+
+def get_max_pos(current_pos,path = PATH):
+    conn = log_db(path)
+    question_pos = None
+    try : 
+        data = conn.execute("SELECT * FROM question order by position DESC")
+        for row in data : 
+            print(row[0])
+            question_pos = row[0]
+            break
+    except Exception as e : 
+        print(e)
+    finally : 
+        conn.close()
+        if question_pos == None : return 1
+        else : 
+            if question_pos > current_pos :
+                return current_pos
+            else : 
+                return question_pos + 1

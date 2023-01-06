@@ -60,19 +60,19 @@ def add_questions() :
     try : 
         jwt.decode_token(token)
         payload = request.get_json()
-        count = int(database.count_elements("question"))
         # check if all parameters are present to create a new question
         missing_params = database.check_parameter(payload)
+        pot_id = database.get_max_id() + 1
         if missing_params == []:
             print("parfait il manque rien")
         else : 
             return {"missing_params": missing_params}, 422
         question = models.Question(
-                            id = count,
+                            id = pot_id,
                             title = payload["title"],
                             text = payload["text"],
                             image = payload["image"],
-                            position = payload["position"],
+                            position = database.get_max_pos(payload["position"]),
                             possibleAnswers = payload["possibleAnswers"]
                         )
         # avoid having questions with different position (1, 2, 3, 7, 8, ...)
@@ -161,7 +161,7 @@ def get_questions_by_position():
         return question.toJson(), 200 
     except :  
         count = database.count_elements("question") 
-        questions = database.retrieve_all_question(count) 
+        questions = database.retrieve_all_question() 
         return [json.loads(elt.toJson()) for elt in questions], 200 
 
 @quiz.route("/questions/<question_id>", methods=["PUT"])
