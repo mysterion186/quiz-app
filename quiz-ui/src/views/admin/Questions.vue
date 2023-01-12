@@ -1,6 +1,10 @@
 <template>
     <h1 style="text-align: center;">Listes toutes les questions :</h1>
-    <button type="button" style="margin-right: 10px;" @click="LogOut" class="btn btn-danger">Déconnexion</button>
+    <div style="display: flex; flex-direction:row">
+        <button type="button" style="margin-right: 10px;" @click="DelParticipations" class="btn btn-warning">Supprimer les participations</button>
+        <button type="button" style="margin-right: 10px;" @click="DelQuestions" class="btn btn-warning">Supprimer les questions</button>
+        <button type="button" style="margin-right: 10px;" @click="LogOut" class="btn btn-danger">Déconnexion</button>
+    </div>
     <br />
     <div v-for="question in questions" v-bind:key="question.id" @click="Detail(question.id)" style="margin: 0 auto">
         <div class="container green_hover">
